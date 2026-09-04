@@ -2,12 +2,25 @@ name: dailyreport
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    # 08:00 UTC daily = 09:00 WAT (Nigeria)
+    - cron: '0 8 * * *'
   workflow_dispatch:
 
 jobs:
-  my-job:
+  send-ai-news:
     runs-on: ubuntu-latest
     steps:
-     - name: first-step
-       run: echo "hello world"
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Send daily AI news email
+        run: python .github/scripts/send_ai_news.py
+        env:
+          GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          TO_EMAIL: ${{ secrets.TO_EMAIL }}
